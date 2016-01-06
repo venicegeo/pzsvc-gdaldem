@@ -10,41 +10,10 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws"
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/aws/aws-sdk-go/aws/session"
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/aws/aws-sdk-go/service/s3"
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/julienschmidt/httprouter"
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/venicegeo/pzsvc-pdal/objects"
+	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/venicegeo/pzsvc-sdk-go/objects"
+	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/venicegeo/pzsvc-sdk-go/utils"
 )
-
-// S3Bucket defines the expected JSON structure for S3 buckets.
-// An S3 bucket can be used for source (input) and destination (output) files.
-type S3Bucket struct {
-	Bucket string `json:"bucket"`
-	Key    string `json:"key"`
-}
-
-// JobInput defines the expected input JSON structure.
-// We currently support S3 input (bucket/key), though provider-specific (e.g.,
-// GRiD) may be legitimate.
-type JobInput struct {
-	Source      S3Bucket         `json:"source"`
-	Function    *string          `json:"function"`
-	Options     *json.RawMessage `json:"options"`
-	Destination S3Bucket         `json:"destination"`
-}
-
-// JobOutput defines the expected output JSON structure.
-type JobOutput struct {
-	Input      JobInput                    `json:"input"`
-	StartedAt  time.Time                   `json:"started_at"`
-	FinishedAt time.Time                   `json:"finished_at"`
-	Code       int                         `json:"code"`
-	Message    string                      `json:"message"`
-	Response   map[string]*json.RawMessage `json:"response"`
-}
 
 // GdalDemHandler handles PDAL jobs.
 func GdalDemHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -107,22 +76,13 @@ func GdalDemHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	log.Println(msg.Source.Bucket)
 	log.Println(msg.Source.Key)
 	log.Println(fileIn.Name())
-	downloader := s3manager.NewDownloader(session.New(&aws.Config{Region: aws.String("us-east-1")}))
-	numBytes, err := downloader.Download(fileIn,
-		&s3.GetObjectInput{
-			Bucket: aws.String(msg.Source.Bucket),
-			Key:    aws.String(msg.Source.Key),
-		})
+	// end stolen from pzsvc-pdal
+
+	utils.S3Download(fileIn, msg.Source.Bucket, msg.Source.Key)
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok {
-			log.Println("Error:", awsErr.Code(), awsErr.Message())
-		} else {
-			fmt.Println(err.Error())
-		}
+		utils.InternalError(w, r, &res, err.Error())
 		return
 	}
-	log.Println("Downloaded", numBytes, "bytes")
-	// end stolen from pzsvc-pdal
 
 	var args []string
 	args = append(args, *msg.Function)
@@ -134,20 +94,10 @@ func GdalDemHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	// more from pzsvc-pdal
 	// If an output has been created, upload the destination data to S3,
 	// throwing 500 on error.
-	uploader := s3manager.NewUploader(session.New(&aws.Config{Region: aws.String("us-east-1")}))
-	result, err := uploader.Upload(&s3manager.UploadInput{
-		Body:   fileOut,
-		Bucket: aws.String(msg.Destination.Bucket),
-		Key:    aws.String(msg.Destination.Key),
-	})
+	// end from pzsvc-pdal
+	err = utils.S3Upload(fileOut, msg.Destination.Bucket, msg.Destination.Key)
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok {
-			log.Println("Error:", awsErr.Code(), awsErr.Message())
-		} else {
-			fmt.Println(err.Error())
-		}
+		utils.InternalError(w, r, &res, err.Error())
 		return
 	}
-	log.Println("Successfully uploaded to", result.Location)
-	// end from pzsvc-pdal
 }
