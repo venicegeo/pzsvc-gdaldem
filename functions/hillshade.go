@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2016, RadiantBlue Technologies, Inc.
+Copyright 2016, RadiantBlue Technologies, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,8 +22,7 @@ import (
 	"net/http"
 	"os/exec"
 
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/venicegeo/pzsvc-sdk-go/objects"
-	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/venicegeo/pzsvc-sdk-go/utils"
+	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
 // HillshadeOptions defines options for dart sampling.
@@ -40,11 +39,11 @@ func NewHillshadeOptions() *HillshadeOptions {
 
 // HillshadeFunction implements pdal height.
 func HillshadeFunction(w http.ResponseWriter, r *http.Request,
-	res *objects.JobOutput, msg objects.JobInput, i, o string) {
+	res *job.OutputMsg, msg job.InputMsg, i, o string) {
 	opts := NewHillshadeOptions()
 	if msg.Options != nil {
 		if err := json.Unmarshal(*msg.Options, &opts); err != nil {
-			utils.BadRequest(w, r, *res, err.Error())
+			job.BadRequest(w, r, *res, err.Error())
 			return
 		}
 	}
