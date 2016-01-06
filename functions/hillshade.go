@@ -1,0 +1,62 @@
+/*
+Copyright 2015-2016, RadiantBlue Technologies, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package functions
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os/exec"
+
+	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/venicegeo/pzsvc-sdk-go/objects"
+	"github.com/venicegeo/pzsvc-gdaldem/Godeps/_workspace/src/github.com/venicegeo/pzsvc-sdk-go/utils"
+)
+
+// HillshadeOptions defines options for dart sampling.
+type HillshadeOptions struct {
+	// Radius is minimum distance criteria. No two points in the sampled point
+	// cloud will be closer than the specified radius.
+	Radius float64 `json:"radius"`
+}
+
+// NewHillshadeOptions constructs HillshadeOptions with default values.
+func NewHillshadeOptions() *HillshadeOptions {
+	return &HillshadeOptions{Radius: 1.0}
+}
+
+// HillshadeFunction implements pdal height.
+func HillshadeFunction(w http.ResponseWriter, r *http.Request,
+	res *objects.JobOutput, msg objects.JobInput, i, o string) {
+	opts := NewHillshadeOptions()
+	if msg.Options != nil {
+		if err := json.Unmarshal(*msg.Options, &opts); err != nil {
+			utils.BadRequest(w, r, *res, err.Error())
+			return
+		}
+	}
+
+	var args []string
+	args = append(args, *msg.Function)
+	args = append(args, i)
+	args = append(args, o)
+	out, err := exec.Command("gdaldem", args...).CombinedOutput()
+
+	if err != nil {
+		fmt.Println(string(out))
+		fmt.Println(err.Error())
+	}
+}
