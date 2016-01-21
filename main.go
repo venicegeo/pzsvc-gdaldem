@@ -49,7 +49,7 @@ func main() {
 		defaultPort = "8080"
 	}
 
-	log.Println("Starting on ", defaultPort)
+	log.Println("Starting on port ", defaultPort)
 	log.Println(os.Getenv("PATH"))
 	log.Println(os.Getenv("LD_LIBRARY_PATH"))
 	if err := http.ListenAndServe(":"+defaultPort, router); err != nil {
