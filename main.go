@@ -31,6 +31,7 @@ import (
 	"os"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/venicegeo/pzsvc-gdaldem/handlers"
 )
 
 func main() {
@@ -41,10 +42,9 @@ func main() {
 	})
 
 	// Setup the PDAL service.
-	// router.POST("/gdaldem", handlers.GdalDemHandler)
+	router.POST("/gdaldem", handlers.GdalDemHandler)
 
 	var defaultPort = os.Getenv("PORT")
-	log.Println("PORT is ", defaultPort)
 	if defaultPort == "" {
 		defaultPort = "8080"
 	}
