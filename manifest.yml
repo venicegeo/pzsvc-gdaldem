@@ -1,0 +1,10 @@
+applications:
+- name: pzsvc-gdaldem
+  host: pzsvc-gdaldem
+  memory: 1G
+  instances: 1
+  timeout: 80
+  command: ./pzsvc-gdaldem
+  buildpack: https://github.com/venicegeo/go-gdaldem-buildpack
+  env:
+    GO15VENDOREXPERIMENT: "1"
