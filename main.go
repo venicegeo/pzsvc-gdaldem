@@ -50,6 +50,8 @@ func main() {
 	}
 
 	log.Println("Starting on ", defaultPort)
+	log.Println(os.Getenv("PATH"))
+	log.Println(os.Getenv("LD_LIBRARY_PATH"))
 	if err := http.ListenAndServe(":"+defaultPort, router); err != nil {
 		log.Fatal(err)
 	}
