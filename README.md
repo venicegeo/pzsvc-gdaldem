@@ -3,41 +3,52 @@
 
 # pzsvc-gdaldem
 
-Needs updates
+[GDAL](http://www.gdal.org/) is a commonly used library and set of tools for raster processing. The [gdaldem](http://www.gdal.org/gdaldem.html) program provides tools for working with elevation rasters, e.g., creating hillshades. The purpose of this application is to expose `gdaldem` as an API endpoint.
 
-# Install
+## Install
 
-[GDAL](http://www.gdal.org/) is a commonly used library and set of tools for raster processing. The [gdaldem](http://www.gdal.org/gdaldem.html) program provides tools for working with elevation rasters, e.g., creating hillshades. We have created a [Dockerfile](https://github.com/venicegeo/dockerfiles/blob/master/gdaldem/Dockerfile) that generates a Docker image consisting of gdaldem. It can be built with the following commands
+For `pzsvc-gdaldem` to function properly, GDAL must be installed on your system. Our manifest.yml file specifies a custom buildpack to ensure that GDAL is available on Cloud Foundry. For local operation, follow installation instructions for your system, e.g., `brew install gdal` on Mac OS X.
 
-```console
-$ git clone https://github.com/venicegeo/dockerfiles/gdaldem
-$ cd gdaldem
-$ docker build -t venicegeo/gdaldem .
-```
-
-This in turn serves as the base image for our microservice, which is written in Go.
-
-`pzsvc-gdaldem` uses [Glide](https://github.com/Masterminds/glide) to manage its dependencies. Assuming you are on a Mac OS X, Glide can be easily installed via [Homebrew](https://github.com/Homebrew/homebrew) (alternative installation instruction can be found on the Glide webpage).
-
-```console
-$ brew install glide
-```
-
-We also make use of [Go 1.5's vendor/ experiment](https://medium.com/@freeformz/go-1-5-s-vendor-experiment-fd3e830f52c3#.ueuy8ao53), so you'll need to make sure you are running Go 1.5+.
-
-Installing `pzsvc-gdaldem` is as simple as cloning the repo, installing dependencies, and running the provided `build.sh`.
+To install `pzsvc-gdaldem`, simply clone the repository and issue a `go install` command.
 
 ```console
 $ git clone https://github.com/venicegeo/pzsvc-gdaldem
 $ cd pzsvc-gdaldem
-$ glide install
-$ scripts/build.sh
+$ go install github.com/venicegeo/pzsvc-gdaldem
 ```
 
-The build script will first compile the Go code in a temporary container. The resulting static Go binary is then copied into our `venicegeo/pzsvc-gdaldem` image during the `docker build` step.
-
-Finally, the service is started on port 8080, mounting your `~/.aws/credentials` to the image with `run.sh`.
+Assuming `$GOPATH/bin` is on your `$PATH`, the service can easily be started on port 8080.
 
 ```console
-$ scripts/run.sh
+$ pzsvc-gdaldem
 ```
+
+The following curl command should return `Hi!`.
+
+```console
+$ curl -X GET -H "Cache-Control: no-cache" -H "Postman-Token: 73e58ef4-44ba-8b40-6868-72ff404b41dd" 'http://localhost:8080'
+```
+
+## Example
+
+While this one will download the sample `elevation.tif` from S3, create a hillshade with default parameters, and upload the result to S3 as `hillshade.tif`.
+
+```console
+curl -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache" -H "Postman-Token: d5eb710b-cf94-c8b1-db29-98d4df633895" -d '{
+    "source": {
+        "bucket": "venicegeo-sample-data",
+        "key": "raster/elevation.tif"
+    },
+    "function":"hillshade",
+    "destination": {
+        "bucket": "venicegeo-sample-data",
+        "key": "temp/hillshade.tif"
+    }
+}' 'http://localhost:8080/gdaldem'
+```
+
+## Deploying
+
+When deployed, `localhost:8080` is replaced with `pzsvc-gdaldem.cf.piazzageo.io`.
+
+All commits to master will be pushed through the VeniceGeo DevOps infrastructure, first triggering a build in Jenkins and, upon success, pushing the resulting binaries to Cloud Foundry.
