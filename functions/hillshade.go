@@ -21,23 +21,35 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+	"strconv"
 
 	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
-// HillshadeOptions defines options for dart sampling.
+// HillshadeOptions defines options for gdaldem hillshade.
 type HillshadeOptions struct {
-	// Radius is minimum distance criteria. No two points in the sampled point
-	// cloud will be closer than the specified radius.
-	Radius float64 `json:"radius"`
+	ZFactor  float64 `json:"zFactor"`
+	Scale    float64 `json:"scale"`
+	Azimuth  float64 `json:"azimuth"`
+	Altitude float64 `json:"altitude"`
+	Combined bool    `json:"combined"`
+	GeneralOptions
 }
 
 // NewHillshadeOptions constructs HillshadeOptions with default values.
 func NewHillshadeOptions() *HillshadeOptions {
-	return &HillshadeOptions{Radius: 1.0}
+	opts := NewGeneralOptions()
+	return &HillshadeOptions{
+		ZFactor:        1.0,
+		Scale:          1.0,
+		Azimuth:        315.0,
+		Altitude:       45.0,
+		Combined:       false,
+		GeneralOptions: *opts,
+	}
 }
 
-// HillshadeFunction implements pdal height.
+// HillshadeFunction implements gdaldem hillshade.
 func HillshadeFunction(w http.ResponseWriter, r *http.Request,
 	res *job.OutputMsg, msg job.InputMsg, i, o string) {
 	opts := NewHillshadeOptions()
@@ -52,6 +64,29 @@ func HillshadeFunction(w http.ResponseWriter, r *http.Request,
 	args = append(args, *msg.Function)
 	args = append(args, i)
 	args = append(args, o)
+	args = append(args, "-of")
+	args = append(args, opts.GeneralOptions.Format)
+	if opts.GeneralOptions.ComputeEdges {
+		args = append(args, "-compute_edges")
+	}
+	args = append(args, "-alg")
+	args = append(args, opts.GeneralOptions.Alg)
+	args = append(args, "-b")
+	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
+	if opts.GeneralOptions.Quiet {
+		args = append(args, "-q")
+	}
+	args = append(args, "-z")
+	args = append(args, strconv.FormatFloat(opts.ZFactor, 'f', -1, 64))
+	args = append(args, "-s")
+	args = append(args, strconv.FormatFloat(opts.Scale, 'f', -1, 64))
+	args = append(args, "-az")
+	args = append(args, strconv.FormatFloat(opts.Azimuth, 'f', -1, 64))
+	args = append(args, "-alt")
+	args = append(args, strconv.FormatFloat(opts.Altitude, 'f', -1, 64))
+	if opts.Combined {
+		args = append(args, "-combined")
+	}
 	out, err := exec.Command("gdaldem", args...).CombinedOutput()
 
 	if err != nil {

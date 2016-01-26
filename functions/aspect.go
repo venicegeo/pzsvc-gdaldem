@@ -21,27 +21,29 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+	"strconv"
 
 	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
-// AspectOptions defines options for dart sampling.
+// AspectOptions defines options for gdaldem aspect.
 type AspectOptions struct {
-	// Radius is minimum distance criteria. No two points in the sampled point
-	// cloud will be closer than the specified radius.
 	Trigonometric bool `json:"trigonometric"`
 	ZeroForFlat   bool `json:"zero_for_flat"`
+	GeneralOptions
 }
 
 // NewAspectOptions constructs AspectOptions with default values.
 func NewAspectOptions() *AspectOptions {
+	opts := NewGeneralOptions()
 	return &AspectOptions{
-		Trigonometric: false,
-		ZeroForFlat:   false,
+		Trigonometric:  false,
+		ZeroForFlat:    false,
+		GeneralOptions: *opts,
 	}
 }
 
-// Aspect implements pdal height.
+// Aspect implements gdaldem aspect.
 func Aspect(w http.ResponseWriter, r *http.Request,
 	res *job.OutputMsg, msg job.InputMsg, i, o string) {
 	opts := NewAspectOptions()
@@ -56,6 +58,18 @@ func Aspect(w http.ResponseWriter, r *http.Request,
 	args = append(args, *msg.Function)
 	args = append(args, i)
 	args = append(args, o)
+	args = append(args, "-of")
+	args = append(args, opts.GeneralOptions.Format)
+	if opts.GeneralOptions.ComputeEdges {
+		args = append(args, "-compute_edges")
+	}
+	args = append(args, "-alg")
+	args = append(args, opts.GeneralOptions.Alg)
+	args = append(args, "-b")
+	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
+	if opts.GeneralOptions.Quiet {
+		args = append(args, "-q")
+	}
 	if opts.Trigonometric {
 		args = append(args, "-trigonometric")
 	}

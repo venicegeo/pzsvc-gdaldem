@@ -26,23 +26,24 @@ import (
 	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
-// SlopeOptions defines options for dart sampling.
+// SlopeOptions defines options for gdaldem slope.
 type SlopeOptions struct {
-	// Radius is minimum distance criteria. No two points in the sampled point
-	// cloud will be closer than the specified radius.
 	Percent bool    `json:"percent"`
 	Scale   float64 `json:"scale"`
+	GeneralOptions
 }
 
 // NewSlopeOptions constructs SlopeOptions with default values.
 func NewSlopeOptions() *SlopeOptions {
+	opts := NewGeneralOptions()
 	return &SlopeOptions{
-		Percent: false,
-		Scale:   1.0,
+		Percent:        false,
+		Scale:          1.0,
+		GeneralOptions: *opts,
 	}
 }
 
-// Slope implements pdal height.
+// Slope implements gdaldem slope.
 func Slope(w http.ResponseWriter, r *http.Request,
 	res *job.OutputMsg, msg job.InputMsg, i, o string) {
 	opts := NewSlopeOptions()
@@ -57,6 +58,18 @@ func Slope(w http.ResponseWriter, r *http.Request,
 	args = append(args, *msg.Function)
 	args = append(args, i)
 	args = append(args, o)
+	args = append(args, "-of")
+	args = append(args, opts.GeneralOptions.Format)
+	if opts.GeneralOptions.ComputeEdges {
+		args = append(args, "-compute_edges")
+	}
+	args = append(args, "-alg")
+	args = append(args, opts.GeneralOptions.Alg)
+	args = append(args, "-b")
+	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
+	if opts.GeneralOptions.Quiet {
+		args = append(args, "-q")
+	}
 	if opts.Percent {
 		args = append(args, "-p")
 	}

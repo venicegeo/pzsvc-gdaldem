@@ -17,44 +17,55 @@ limitations under the License.
 package functions
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os/exec"
+	"strconv"
 
 	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
-// // RoughnessOptions defines options for dart sampling.
-// type RoughnessOptions struct {
-// 	// Radius is minimum distance criteria. No two points in the sampled point
-// 	// cloud will be closer than the specified radius.
-// 	Percent bool    `json:"percent"`
-// 	Scale   float64 `json:"scale"`
-// }
-//
-// // NewRoughnessOptions constructs RoughnessOptions with default values.
-// func NewRoughnessOptions() *RoughnessOptions {
-// 	return &RoughnessOptions{
-// 		Percent: false,
-// 		Scale:   1.0,
-// 	}
-// }
+// RoughnessOptions defines options for gdaldem roughness.
+type RoughnessOptions struct {
+	GeneralOptions
+}
 
-// Roughness implements pdal height.
+// NewRoughnessOptions constructs RoughnessOptions with default values.
+func NewRoughnessOptions() *RoughnessOptions {
+	opts := NewGeneralOptions()
+	return &RoughnessOptions{
+		GeneralOptions: *opts,
+	}
+}
+
+// Roughness implements gdaldem roughness.
 func Roughness(w http.ResponseWriter, r *http.Request,
 	res *job.OutputMsg, msg job.InputMsg, i, o string) {
-	// opts := NewRoughnessOptions()
-	// if msg.Options != nil {
-	// 	if err := json.Unmarshal(*msg.Options, &opts); err != nil {
-	// 		job.BadRequest(w, r, *res, err.Error())
-	// 		return
-	// 	}
-	// }
+	opts := NewRoughnessOptions()
+	if msg.Options != nil {
+		if err := json.Unmarshal(*msg.Options, &opts); err != nil {
+			job.BadRequest(w, r, *res, err.Error())
+			return
+		}
+	}
 
 	var args []string
 	args = append(args, *msg.Function)
 	args = append(args, i)
 	args = append(args, o)
+	args = append(args, "-of")
+	args = append(args, opts.GeneralOptions.Format)
+	if opts.GeneralOptions.ComputeEdges {
+		args = append(args, "-compute_edges")
+	}
+	args = append(args, "-alg")
+	args = append(args, opts.GeneralOptions.Alg)
+	args = append(args, "-b")
+	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
+	if opts.GeneralOptions.Quiet {
+		args = append(args, "-q")
+	}
 	out, err := exec.Command("gdaldem", args...).CombinedOutput()
 
 	if err != nil {
