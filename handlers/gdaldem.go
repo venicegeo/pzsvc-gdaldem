@@ -54,8 +54,17 @@ func GdalDemHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	case "hillshade":
 		utils.MakeFunction(functions.HillshadeFunction)(w, r, &res, msg)
 
+	case "roughness":
+		utils.MakeFunction(functions.Roughness)(w, r, &res, msg)
+
 	case "slope":
 		utils.MakeFunction(functions.Slope)(w, r, &res, msg)
+
+	case "TPI":
+		utils.MakeFunction(functions.TPI)(w, r, &res, msg)
+
+	case "TRI":
+		utils.MakeFunction(functions.TRI)(w, r, &res, msg)
 
 	// An unrecognized function will result in 400 error, with message explaining
 	// how to list available functions.
