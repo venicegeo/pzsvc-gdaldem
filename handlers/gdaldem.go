@@ -48,6 +48,9 @@ func GdalDemHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 
 	// Make/execute the requested function.
 	switch *msg.Function {
+	case "aspect":
+		utils.MakeFunction(functions.Aspect)(w, r, &res, msg)
+
 	case "hillshade":
 		utils.MakeFunction(functions.HillshadeFunction)(w, r, &res, msg)
 
