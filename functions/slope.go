@@ -60,7 +60,8 @@ func Slope(w http.ResponseWriter, r *http.Request,
 	if opts.Percent {
 		args = append(args, "-p")
 	}
-	args = append(args, "-s "+strconv.FormatFloat(opts.Scale, 'f', -1, 64))
+	args = append(args, "-s")
+	args = append(args, strconv.FormatFloat(opts.Scale, 'f', -1, 64))
 	out, err := exec.Command("gdaldem", args...).CombinedOutput()
 
 	if err != nil {
