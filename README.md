@@ -5,7 +5,12 @@
 
 [GDAL](http://www.gdal.org/) is a commonly used library and set of tools for raster processing. The [gdaldem](http://www.gdal.org/gdaldem.html) program provides tools for working with elevation rasters, e.g., creating hillshades. The purpose of this application is to expose `gdaldem` as an API endpoint.
 
+
 ## Install
+
+Go 1.5+ is required. You can download it [here](https://golang.org/dl/).
+
+If you have not already done so, make sure you've setup your Go [workspace](https://golang.org/doc/code.html#Workspaces) and set the necessary environment [variables](https://golang.org/doc/code.html#GOPATH).
 
 For `pzsvc-gdaldem` to function properly, GDAL must be installed on your system. Our manifest.yml file specifies a custom buildpack to ensure that GDAL is available on Cloud Foundry. For local operation, follow installation instructions for your system, e.g., `brew install gdal` on Mac OS X.
 
