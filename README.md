@@ -7,6 +7,10 @@
 
 ## Install
 
+Go 1.5+ is required. You can download it [here](https://golang.org/dl/).
+
+If you have not already done so, make sure you've setup your Go [workspace](https://golang.org/doc/code.html#Workspaces) and set the necessary environment [variables](https://golang.org/doc/code.html#GOPATH).
+
 For `pzsvc-gdaldem` to function properly, GDAL must be installed on your system. Our manifest.yml file specifies a custom buildpack to ensure that GDAL is available on Cloud Foundry. For local operation, follow installation instructions for your system, e.g., `brew install gdal` on Mac OS X.
 
 To install `pzsvc-gdaldem`, simply clone the repository and issue a `go install` command.
