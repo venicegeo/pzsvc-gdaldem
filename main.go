@@ -40,6 +40,7 @@ func main() {
 	m := job.ResourceMetadata{
 		Name:             "pzsvc-gdaldem",
 		URL:              "http://pzsvc-gdaldem.cf.piazzageo.io/gdaldem",
+//		URL:              "http://localhost:8080/gdaldem",
 		Description:      "GDAL's gdaldem: Tools to analyze and visualize DEMs",
 		Method:           "POST",
 		RequestMimeType:  job.ContentTypeJSON,
