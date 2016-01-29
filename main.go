@@ -32,9 +32,23 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/venicegeo/pzsvc-gdaldem/handlers"
+	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
 func main() {
+
+	m := job.ResourceMetadata{
+		Name:             "pzsvc-gdaldem",
+		URL:              "http://pzsvc-gdaldem.cf.piazzageo.io/gdaldem",
+		Description:      "GDAL's gdaldem: Tools to analyze and visualize DEMs",
+		Method:           "POST",
+		RequestMimeType:  job.ContentTypeJSON,
+	 	ResponseMimeType: job.ContentTypeJSON,
+	}
+	if err := job.RegisterService(m); err != nil {
+		log.Println(err)
+	}
+
 	router := httprouter.New()
 
 	router.GET("/", func(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
@@ -53,6 +67,6 @@ func main() {
 	log.Println(os.Getenv("PATH"))
 	log.Println(os.Getenv("LD_LIBRARY_PATH"))
 	if err := http.ListenAndServe(":"+defaultPort, router); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }

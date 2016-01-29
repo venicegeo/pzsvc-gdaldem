@@ -6,5 +6,4 @@ applications:
   timeout: 80
   command: ./pzsvc-gdaldem
   buildpack: https://github.com/venicegeo/go-gdaldem-buildpack
-  env:
-    GO15VENDOREXPERIMENT: "1"
+  
