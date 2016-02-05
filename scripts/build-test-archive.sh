@@ -9,11 +9,13 @@ mkdir -p $GOPATH
 
 ###
 
-go get github.com/venicegeo/pzsvc-gdaldem
+export GO15VENDOREXPERIMENT=1
 
-go test -v github.com/venicegeo/pzsvc-gdaldem
+go get -v github.com/venicegeo/pzsvc-gdaldem
 
-go install github.com/venicegeo/pzsvc-gdaldem
+go test -v $(go list github.com/venicegeo/pzsvc-gdaldem/... | grep -v /vendor/)
+
+go install -v github.com/venicegeo/pzsvc-gdaldem
 
 ###
 
