@@ -57,3 +57,22 @@ curl -X POST -H "Content-Type: application/json" -H "Cache-Control: no-cache" -H
 When deployed, `localhost:8080` is replaced with `pzsvc-gdaldem.cf.piazzageo.io`.
 
 All commits to master will be pushed through the VeniceGeo DevOps infrastructure, first triggering a build in Jenkins and, upon success, pushing the resulting binaries to Cloud Foundry.
+
+### Diego Experiment on Pivotal Cloud Foundry
+
+Until we get an official DevOps workflow for this...
+
+Just execute the `build-for-cf2.sh` script and then do a
+
+```console
+$ cf push pzsvc-gdaldem -o chambbj/pzsvc-gdaldem
+```
+
+We will likely want to stand up a venicegeo Docker Hub organization/identity. Also, I don't think private repos are a possibility at the moment. Does this totally mess things up down the road?
+
+I don't recall having to set environment variable for our AWS credentials previously. It is required here.
+
+Other changes of note:
+
+* `cf files` no longer works. We are supposed to use `cf ssh` instead, but I believe that requires some extra setup.
+* Use `PORT` instead of `VCAP_APP_PORT`. It now just defaults to 8080 (the same as our default).

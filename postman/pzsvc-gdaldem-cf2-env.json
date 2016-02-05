@@ -1,0 +1,23 @@
+{
+	"id": "7b2a7bab-075c-738e-7d0a-9616a3da2cf6",
+	"name": "pzsvc-gdaldem CF2",
+	"values": [
+		{
+			"key": "url",
+			"value": "http://pzsvc-gdaldem.apps.cf2.piazzageo.io",
+			"type": "text",
+			"name": "url",
+			"enabled": true
+		},
+		{
+			"key": "base_url",
+			"value": null,
+			"type": "text",
+			"name": "base_url",
+			"enabled": true
+		}
+	],
+	"timestamp": 1454695315335,
+	"synced": false,
+	"syncedFilename": ""
+}
