@@ -25,28 +25,45 @@ Examples
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/julienschmidt/httprouter"
 	"github.com/venicegeo/pzsvc-gdaldem/handlers"
-	"github.com/venicegeo/pzsvc-sdk-go/job"
+	"github.com/venicegeo/pzsvc-sdk-go/servicecontroller"
 )
+
+type appHandler func(http.ResponseWriter, *http.Request) *handlers.AppError
+
+func (fn appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if e := fn(w, r); e != nil { // e is *appError, not os.Error.
+		if awsErr, ok := e.Error.(awserr.Error); ok {
+			e.Message = awsErr.Message()
+		}
+
+		if err := json.NewEncoder(w).Encode(e); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		w.WriteHeader(e.Code)
+	}
+}
 
 func main() {
 
-	m := job.ResourceMetadata{
-		Name:             "pzsvc-gdaldem",
-		URL:              "http://pzsvc-gdaldem.cf.piazzageo.io/gdaldem",
-//		URL:              "http://localhost:8080/gdaldem",
+	m := servicecontroller.ResourceMetadata{
+		Name: "pzsvc-gdaldem",
+		URL:  "http://pzsvc-gdaldem.cf.piazzageo.io/gdaldem",
+		//		URL:              "http://localhost:8080/gdaldem",
 		Description:      "GDAL's gdaldem: Tools to analyze and visualize DEMs",
 		Method:           "POST",
-		RequestMimeType:  job.ContentTypeJSON,
-	 	ResponseMimeType: job.ContentTypeJSON,
+		RequestMimeType:  servicecontroller.ContentTypeJSON,
+		ResponseMimeType: servicecontroller.ContentTypeJSON,
 	}
-	if err := job.RegisterService(m); err != nil {
+	if err := servicecontroller.RegisterService(m); err != nil {
 		log.Println(err)
 	}
 
@@ -57,7 +74,7 @@ func main() {
 	})
 
 	// Setup the PDAL service.
-	router.POST("/gdaldem", handlers.GdalDemHandler)
+	router.Handler("POST", "/gdaldem", appHandler(handlers.GdalDemHandler))
 
 	var defaultPort = os.Getenv("PORT")
 	if defaultPort == "" {

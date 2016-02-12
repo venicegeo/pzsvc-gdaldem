@@ -19,11 +19,8 @@ package functions
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os/exec"
 	"strconv"
-
-	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
 // TRIOptions defines options for gdaldem TRI.
@@ -40,18 +37,16 @@ func NewTRIOptions() *TRIOptions {
 }
 
 // TRI implements gdaldem TRI.
-func TRI(w http.ResponseWriter, r *http.Request,
-	res *job.OutputMsg, msg job.InputMsg, i, o string) {
+func TRI(i, o string, options *json.RawMessage) ([]byte, error) {
 	opts := NewTRIOptions()
-	if msg.Options != nil {
-		if err := json.Unmarshal(*msg.Options, &opts); err != nil {
-			job.BadRequest(w, r, *res, err.Error())
-			return
+	if options != nil {
+		if err := json.Unmarshal(*options, &opts); err != nil {
+			return nil, err
 		}
 	}
 
 	var args []string
-	args = append(args, *msg.Function)
+	args = append(args, "tri")
 	args = append(args, i)
 	args = append(args, o)
 	args = append(args, "-of")
@@ -68,8 +63,10 @@ func TRI(w http.ResponseWriter, r *http.Request,
 	}
 	out, err := exec.Command("gdaldem", args...).CombinedOutput()
 
+	fmt.Println(string(out))
 	if err != nil {
-		fmt.Println(string(out))
-		fmt.Println(err.Error())
+		return nil, err
 	}
+
+	return nil, nil
 }
