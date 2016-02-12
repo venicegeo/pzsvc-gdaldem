@@ -19,11 +19,8 @@ package functions
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os/exec"
 	"strconv"
-
-	"github.com/venicegeo/pzsvc-sdk-go/job"
 )
 
 // RoughnessOptions defines options for gdaldem roughness.
@@ -40,18 +37,16 @@ func NewRoughnessOptions() *RoughnessOptions {
 }
 
 // Roughness implements gdaldem roughness.
-func Roughness(w http.ResponseWriter, r *http.Request,
-	res *job.OutputMsg, msg job.InputMsg, i, o string) {
+func Roughness(i, o string, options *json.RawMessage) ([]byte, error) {
 	opts := NewRoughnessOptions()
-	if msg.Options != nil {
-		if err := json.Unmarshal(*msg.Options, &opts); err != nil {
-			job.BadRequest(w, r, *res, err.Error())
-			return
+	if options != nil {
+		if err := json.Unmarshal(*options, &opts); err != nil {
+			return nil, err
 		}
 	}
 
 	var args []string
-	args = append(args, *msg.Function)
+	args = append(args, "roughness")
 	args = append(args, i)
 	args = append(args, o)
 	args = append(args, "-of")
@@ -68,8 +63,10 @@ func Roughness(w http.ResponseWriter, r *http.Request,
 	}
 	out, err := exec.Command("gdaldem", args...).CombinedOutput()
 
+	fmt.Println(string(out))
 	if err != nil {
-		fmt.Println(string(out))
-		fmt.Println(err.Error())
+		return nil, err
 	}
+
+	return nil, nil
 }
