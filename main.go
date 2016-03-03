@@ -34,7 +34,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/julienschmidt/httprouter"
 	"github.com/venicegeo/pzsvc-gdaldem/handlers"
-	"github.com/venicegeo/pzsvc-sdk-go/servicecontroller"
+	"github.com/venicegeo/pzsvc-sdk-go/gateway"
 )
 
 type appHandler func(http.ResponseWriter, *http.Request) *handlers.AppError
@@ -54,16 +54,15 @@ func (fn appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	m := servicecontroller.ResourceMetadata{
-		Name: "pzsvc-gdaldem",
-		URL:  "http://pzsvc-gdaldem.cf.piazzageo.io/gdaldem",
-		//		URL:              "http://localhost:8080/gdaldem",
+	m := gateway.ResourceMetadata{
+		Name:             "pzsvc-gdaldem",
+		URL:              "http://pzsvc-gdaldem.cf.piazzageo.io/gdaldem",
 		Description:      "GDAL's gdaldem: Tools to analyze and visualize DEMs",
 		Method:           "POST",
-		RequestMimeType:  servicecontroller.ContentTypeJSON,
-		ResponseMimeType: servicecontroller.ContentTypeJSON,
+		RequestMimeType:  "application/json",
+		ResponseMimeType: "application/json",
 	}
-	if err := servicecontroller.RegisterService(m); err != nil {
+	if err := gateway.RegisterService(m); err != nil {
 		log.Println(err)
 	}
 
