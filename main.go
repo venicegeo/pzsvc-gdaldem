@@ -73,7 +73,7 @@ func main() {
 	})
 
 	// Setup the PDAL service.
-	router.Handler("POST", "/gdaldem", appHandler(handlers.GdalDemHandler))
+	router.Handler("POST", "/api/v1/gdaldem", appHandler(handlers.GdalDemHandler))
 
 	var defaultPort = os.Getenv("PORT")
 	if defaultPort == "" {
@@ -81,8 +81,6 @@ func main() {
 	}
 
 	log.Println("Starting on port ", defaultPort)
-	log.Println(os.Getenv("PATH"))
-	log.Println(os.Getenv("LD_LIBRARY_PATH"))
 	if err := http.ListenAndServe(":"+defaultPort, router); err != nil {
 		log.Println(err)
 	}
