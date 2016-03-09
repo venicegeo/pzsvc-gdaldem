@@ -83,10 +83,6 @@
 			"Rev": "2a059bc51c48c8baa8c3b1ec83c81ad3c584ed2f"
 		},
 		{
-			"ImportPath": "github.com/venicegeo/pzsvc-sdk-go/servicecontroller",
-			"Rev": "2a059bc51c48c8baa8c3b1ec83c81ad3c584ed2f"
-		},
-		{
 			"ImportPath": "github.com/venicegeo/pzsvc-sdk-go/utils",
 			"Rev": "2a059bc51c48c8baa8c3b1ec83c81ad3c584ed2f"
 		}
