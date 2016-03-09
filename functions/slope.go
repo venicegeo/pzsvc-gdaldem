@@ -28,15 +28,18 @@ type SlopeOptions struct {
 	Percent bool    `json:"percent"`
 	Scale   float64 `json:"scale"`
 	GeneralOptions
+	AlgorithmOptions
 }
 
 // NewSlopeOptions constructs SlopeOptions with default values.
 func NewSlopeOptions() *SlopeOptions {
 	opts := NewGeneralOptions()
+	alg := NewAlgorithmOptions()
 	return &SlopeOptions{
-		Percent:        false,
-		Scale:          1.0,
-		GeneralOptions: *opts,
+		Percent:          false,
+		Scale:            1.0,
+		GeneralOptions:   *opts,
+		AlgorithmOptions: *alg,
 	}
 }
 
@@ -59,7 +62,7 @@ func Slope(i, o string, options *json.RawMessage) ([]byte, error) {
 		args = append(args, "-compute_edges")
 	}
 	args = append(args, "-alg")
-	args = append(args, opts.GeneralOptions.Alg)
+	args = append(args, opts.AlgorithmOptions.Alg)
 	args = append(args, "-b")
 	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
 	if opts.GeneralOptions.Quiet {

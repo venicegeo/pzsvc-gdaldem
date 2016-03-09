@@ -54,8 +54,6 @@ func TPI(i, o string, options *json.RawMessage) ([]byte, error) {
 	if opts.GeneralOptions.ComputeEdges {
 		args = append(args, "-compute_edges")
 	}
-	args = append(args, "-alg")
-	args = append(args, opts.GeneralOptions.Alg)
 	args = append(args, "-b")
 	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
 	if opts.GeneralOptions.Quiet {
