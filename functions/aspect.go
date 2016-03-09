@@ -28,15 +28,18 @@ type AspectOptions struct {
 	Trigonometric bool `json:"trigonometric"`
 	ZeroForFlat   bool `json:"zero_for_flat"`
 	GeneralOptions
+	AlgorithmOptions
 }
 
 // NewAspectOptions constructs AspectOptions with default values.
 func NewAspectOptions() *AspectOptions {
 	opts := NewGeneralOptions()
+	alg := NewAlgorithmOptions()
 	return &AspectOptions{
-		Trigonometric:  false,
-		ZeroForFlat:    false,
-		GeneralOptions: *opts,
+		Trigonometric:    false,
+		ZeroForFlat:      false,
+		GeneralOptions:   *opts,
+		AlgorithmOptions: *alg,
 	}
 }
 
@@ -59,7 +62,7 @@ func Aspect(i, o string, options *json.RawMessage) ([]byte, error) {
 		args = append(args, "-compute_edges")
 	}
 	args = append(args, "-alg")
-	args = append(args, opts.GeneralOptions.Alg)
+	args = append(args, opts.AlgorithmOptions.Alg)
 	args = append(args, "-b")
 	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
 	if opts.GeneralOptions.Quiet {

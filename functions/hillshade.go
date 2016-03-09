@@ -31,18 +31,21 @@ type HillshadeOptions struct {
 	Altitude float64 `json:"altitude"`
 	Combined bool    `json:"combined"`
 	GeneralOptions
+	AlgorithmOptions
 }
 
 // NewHillshadeOptions constructs HillshadeOptions with default values.
 func NewHillshadeOptions() *HillshadeOptions {
 	opts := NewGeneralOptions()
+	alg := NewAlgorithmOptions()
 	return &HillshadeOptions{
-		ZFactor:        1.0,
-		Scale:          1.0,
-		Azimuth:        315.0,
-		Altitude:       45.0,
-		Combined:       false,
-		GeneralOptions: *opts,
+		ZFactor:          1.0,
+		Scale:            1.0,
+		Azimuth:          315.0,
+		Altitude:         45.0,
+		Combined:         false,
+		GeneralOptions:   *opts,
+		AlgorithmOptions: *alg,
 	}
 }
 
@@ -65,7 +68,7 @@ func HillshadeFunction(i, o string, options *json.RawMessage) ([]byte, error) {
 		args = append(args, "-compute_edges")
 	}
 	args = append(args, "-alg")
-	args = append(args, opts.GeneralOptions.Alg)
+	args = append(args, opts.AlgorithmOptions.Alg)
 	args = append(args, "-b")
 	args = append(args, strconv.Itoa(opts.GeneralOptions.Band))
 	if opts.GeneralOptions.Quiet {

@@ -20,7 +20,6 @@ package functions
 type GeneralOptions struct {
 	Format       string `json:"format"`
 	ComputeEdges bool   `json:"compute_edges"`
-	Alg          string `json:"alg"`
 	Band         int    `json:"band"`
 	Quiet        bool   `json:"quiet"`
 }
@@ -30,8 +29,19 @@ func NewGeneralOptions() *GeneralOptions {
 	return &GeneralOptions{
 		Format:       "GTiff",
 		ComputeEdges: false,
-		Alg:          "Horn",
 		Band:         1,
 		Quiet:        false,
+	}
+}
+
+// AlgorithmOptions defines options for algorithms.
+type AlgorithmOptions struct {
+	Alg string `json:"alg"`
+}
+
+// NewAlgorithmOptions construct AlgorithmOptions with default values.
+func NewAlgorithmOptions() *AlgorithmOptions {
+	return &AlgorithmOptions{
+		Alg: "Horn",
 	}
 }
