@@ -1,0 +1,35 @@
+{
+	"id": "cb3d21e3-d974-312a-d7df-c958cf33314e",
+	"name": "pzsvc-gdaldem-black-box-tests",
+	"description": "",
+	"order": [
+		"6e8d328a-91b6-6e1b-d9b0-c7ea1e6fa4b2"
+	],
+	"folders": [],
+	"timestamp": 1457554580566,
+	"owner": "280268",
+	"remoteLink": "",
+	"public": false,
+	"requests": [
+		{
+			"id": "6e8d328a-91b6-6e1b-d9b0-c7ea1e6fa4b2",
+			"headers": "",
+			"url": "{{url}}",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "GET",
+			"collectionId": "cb3d21e3-d974-312a-d7df-c958cf33314e",
+			"data": [],
+			"dataMode": "params",
+			"name": "Hello",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1457554604912,
+			"version": 2,
+			"responses": [],
+			"tests": "tests[\"Status code is 200\"] = responseCode.code === 200;\n\ntests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\");\n\ntests[\"Body is correct\"] = responseBody === \"Hi!\";\n\ntests[\"Response time is less than 200ms\"] = responseTime < 200;\n",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		}
+	]
+}
