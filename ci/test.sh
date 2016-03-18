@@ -7,11 +7,13 @@ popd > /dev/null
 export GOPATH=$root/gogo
 mkdir -p $GOPATH
 
+source $root/ci/vars.sh
+
 ###
 export GO15VENDOREXPERIMENT=1
 
-go get -v github.com/venicegeo/pzsvc-gdaldem
+go get -v github.com/venicegeo/$APP
 
-go test -v $(go list github.com/venicegeo/pzsvc-gdaldem/... | grep -v /vendor/)
+go test -v $(go list github.com/venicegeo/$APP/... | grep -v /vendor/)
 
 ###

@@ -7,21 +7,20 @@ popd > /dev/null
 export GOPATH=$root/gogo
 mkdir -p $GOPATH
 
+source $root/ci/vars.sh
+
 ###
 
 export GO15VENDOREXPERIMENT=1
 
-go get -v github.com/venicegeo/pzsvc-gdaldem
+go get -v github.com/venicegeo/$APP
 
-go install -v github.com/venicegeo/pzsvc-gdaldem
+go install -v github.com/venicegeo/$APP
 
 
 ###
 
 src=$GOPATH/bin/$APP
-
-# gather some data about the repo
-source $root/ci/vars.sh
 
 # stage the artifact for a mvn deploy
 mv $src $root/$APP.$EXT
