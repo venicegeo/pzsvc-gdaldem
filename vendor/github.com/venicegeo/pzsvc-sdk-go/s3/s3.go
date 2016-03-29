@@ -62,7 +62,7 @@ This is merely a wrapper around the aws-sdk-go downloader. It allows us to
 isolate the aws-sdk-go dependencies and unify error handling.
 */
 func Download(file *os.File, bucket, key string) error {
-	downloader := s3manager.NewDownloader(session.New(&aws.Config{Region: aws.String("us-east-1")}))
+	downloader := s3manager.NewDownloader(session.New(&aws.Config{Region: aws.String("us-east-1"), CredentialsChainVerboseErrors: aws.Bool(true)}))
 	numBytes, err := downloader.Download(file,
 		&s3.GetObjectInput{
 			Bucket: aws.String(bucket),
